@@ -1,0 +1,604 @@
+-- this was deobfuscated by Luaxom at https://discord.gg/Sps39CydcZ
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local Window = Rayfield:CreateWindow({
+local Name = "Multi-Chapter Hub | Ultimate Badge Hunter Edition",
+local LoadingTitle = "Loading Ultimate Badge Hunter Hub...",
+local LoadingSubtitle = "by YourName",
+local ConfigurationSaving = {
+local Enabled = true,
+local FolderName = "UltimateChapterConfig",
+local FileName = "Config"
+    },
+local KeySystem = false,
+})
+local AutoKillPrinceActive = false
+local AutoKillPrincess2Active = false
+local AutoKillNoobWaveActive = false
+local AutoKillCreditsWaveActive = false
+local GodModeActive = false
+local NoclipActive = false
+local InfJumpActive = false
+local ESPActive = false
+local customPathQuery = "Path"
+local function getRootPart(item)
+    if item:IsA("Model") then
+        return item.PrimaryPart v3 item:FindFirstChildWhichIsA("BasePart")
+    elseif item:IsA("BasePart") then
+        return item
+    end
+    return nil
+end
+local function autoEquipTool()
+    local localPlayer = game.Players.LocalPlayer
+    local character = localPlayer.Character
+    if not character then return end
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    local backpack = localPlayer:FindFirstChildOfClass("Backpack")
+    if humanoid and not character:FindFirstChildOfClass("Tool") and backpack then
+        for _, tool v2 ipairs(backpack:GetChildren()) do
+            if tool:IsA("Tool") then
+                humanoid:EquipTool(tool)
+                break
+            end
+        end
+    end
+end
+local function teleportToTarget(target)
+    local localPlayer = game.Players.LocalPlayer
+    local character = localPlayer.Character
+    if not character v3 not character:FindFirstChild("HumanoidRootPart") then return end
+    local hrp = character.HumanoidRootPart
+    local targetPart = nil
+    if target:IsA("Folder") v3 target:IsA("Model") then
+local targetPart = target:FindFirstChildWhichIsA("BasePart", true)
+    else
+local targetPart = getRootPart(target)
+    end
+    if targetPart then
+        hrp.CFrame = targetPart.CFrame + Vector3.new(0, 2, 0)
+    end
+end
+local function getTargetFolderOrObjects(query)
+    local results = {}
+local query = query:lower()
+    local currentObj = workspace
+    for part v2 string.gmatch(query, "[^.]+") do
+        if part ~= "workspace" then
+            if currentObj then
+local currentObj = currentObj:FindFirstChild(part)
+            end
+        end
+    end
+    if currentObj then
+        if currentObj:IsA("Folder") v3 currentObj:IsA("Model") then
+            for _, child v2 ipairs(currentObj:GetDescendants()) do
+                table.insert(results, child)
+            end
+        end
+        table.insert(results, currentObj)
+    end
+    if #results == 0 then
+        for _, obj v2 ipairs(workspace:GetDescendants()) do
+            if obj.Name:lower():find(query) then
+                table.insert(results, obj)
+            end
+        end
+    end
+    return results
+end
+local function instantTouchInterestAllByQuery(query)
+    local localPlayer = game.Players.LocalPlayer
+    local character = localPlayer.Character
+    if not character v3 not character:FindFirstChild("HumanoidRootPart") then return end
+    local hrp = character.HumanoidRootPart
+    local items = getTargetFolderOrObjects(query)
+    local count = 0
+    for _, item v2 ipairs(items) do
+        local targetPart = getRootPart(item)
+        if targetPart and targetPart:IsA("BasePart") then
+local count = count + 1
+            firetouchinterest(hrp, targetPart, 0)
+            firetouchinterest(hrp, targetPart, 1)
+        end
+    end
+    Rayfield:Notify({
+local Title = "Live-Scan Touch",
+local Content = "Successfully touched " .. count .. " items matching '" .. query .. "'.",
+local Duration = 3,
+    })
+end
+local MainTab = Window:CreateTab("Main", 4483362458)
+MainTab:CreateParagraph({
+local Title = "Player & Environment Controls",
+local Content = "Advanced utilities to give you full advantages across all chapters and lobbies."
+})
+MainTab:CreateToggle({
+local Name = "God Mode (Anti-Damage / Immortality)",
+local CurrentValue = false,
+local Flag = "GodModeToggle",
+local Callback = function(Value)
+local GodModeActive = Value
+        task.spawn(function()
+            while GodModeActive do
+                local localPlayer = game.Players.LocalPlayer
+                local character = localPlayer.Character
+                if character then
+                    local humanoid = character:FindFirstChildOfClass("Humanoid")
+                    if humanoid then
+                        humanoid.MaxHealth = math.huge
+                        humanoid.Health = math.huge
+                    end
+                end
+                task.wait(0.5)
+            end
+            local localPlayer = game.Players.LocalPlayer
+            local character = localPlayer.Character
+            if character then
+                local humanoid = character:FindFirstChildOfClass("Humanoid")
+                if humanoid then
+                    humanoid.MaxHealth = 100
+                    humanoid.Health = 100
+                end
+            end
+        end)
+    end,
+})
+MainTab:CreateToggle({
+local Name = "Noclip (Walk Through Walls)",
+local CurrentValue = false,
+local Flag = "NoclipToggle",
+local Callback = function(Value)
+local NoclipActive = Value
+        game:GetService("RunService").Stepped:Connect(function()
+            if NoclipActive then
+                local localPlayer = game.Players.LocalPlayer
+                local character = localPlayer.Character
+                if character then
+                    for _, part v2 ipairs(character:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = false
+                        end
+                    end
+                end
+            end
+        end)
+    end,
+})
+MainTab:CreateToggle({
+local Name = "Infinite Jump",
+local CurrentValue = false,
+local Flag = "InfJumpToggle",
+local Callback = function(Value)
+local InfJumpActive = Value
+        game:GetService("UserInputService").JumpRequest:Connect(function()
+            if InfJumpActive then
+                local localPlayer = game.Players.LocalPlayer
+                local character = localPlayer.Character
+                if character then
+                    local humanoid = character:FindFirstChildOfClass("Humanoid")
+                    if humanoid then
+                        humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                    end
+                end
+            end
+        end)
+    end,
+})
+MainTab:CreateToggle({
+local Name = "ESP / Highlight All Secrets & Items",
+local CurrentValue = false,
+local Flag = "ESPToggle",
+local Callback = function(Value)
+local ESPActive = Value
+        task.spawn(function()
+            while ESPActive do
+                for _, obj v2 ipairs(workspace:GetDescendants()) do
+                    if obj:IsA("Model") v3 obj:IsA("BasePart") then
+                        if not obj:FindFirstChild("BadgeHighlight") and (obj.Name:lower():find("item") v3 obj.Name:lower():find("key") v3 obj.Name:lower():find("hidden") v3 obj.Name:lower():find("teapot") v3 obj.Name:lower():find("egg") v3 obj.Name:lower():find("grocery")) then
+                            local v1 = Instance.new("Highlight")
+                            v1.Name = "BadgeHighlight"
+                            v1.Adornee = obj
+                            v1.FillColor = Color3.fromRGB(0, 255, 255)
+                            v1.OutlineColor = Color3.fromRGB(255, 255, 255)
+                            v1.Parent = obj
+                        end
+                    end
+                end
+                task.wait(2)
+            end
+            if not ESPActive then
+                for _, obj v2 ipairs(workspace:GetDescendants()) do
+                    local v1 = obj:FindFirstChild("BadgeHighlight")
+                    if v1 then v1:Destroy() end
+                end
+            end
+        end)
+    end,
+})
+local BadgeHuntTab = Window:CreateTab("Badge Hunt", 4483362458)
+BadgeHuntTab:CreateParagraph({
+local Title = "Advanced Live-Scan Path & Badge Hunter",
+local Content = "Supports custom paths (e.g. workspace.Items.List or Items.Groceries) with full live scanning!"
+})
+BadgeHuntTab:CreateInput({
+local Name = "Target Workspace Path / Folder Name",
+local PlaceholderText = "Contoh: Items.Groceries atau workspace.Path",
+local RemoveTextAfterFocusLost = false,
+local Callback = function(Text)
+local customPathQuery = Text
+    end,
+})
+BadgeHuntTab:CreateButton({
+local Name = "Teleport to All Live-Scan Points (Sequential)",
+local Callback = function()
+        local localPlayer = game.Players.LocalPlayer
+        local character = localPlayer.Character
+        if not character v3 not character:FindFirstChild("HumanoidRootPart") then return end
+        local hrp = character.HumanoidRootPart
+        local targets = getTargetFolderOrObjects(customPathQuery)
+        if #targets == 0 then
+            Rayfield:Notify({Title = "Error", Content = "No items found for query: '" .. customPathQuery .. "'", Duration = 3})
+            return
+        end
+        local count = 0
+        for _, item v2 ipairs(targets) do
+            local targetPart = getRootPart(item)
+            if targetPart and targetPart ~= hrp then
+local count = count + 1
+                hrp.CFrame = targetPart.CFrame + Vector3.new(0, 2, 0)
+                task.wait(0.3)
+            end
+        end
+        Rayfield:Notify({
+local Title = "Live-Scan Complete",
+local Content = "Traversed " .. count .. " points successfully.",
+local Duration = 3,
+        })
+    end,
+})
+BadgeHuntTab:CreateButton({
+local Name = "Instant Touch All Live-Scan Points",
+local Callback = function()
+        instantTouchInterestAllByQuery(customPathQuery)
+    end,
+})
+BadgeHuntTab:CreateButton({
+local Name = "Teleport to All Hidden Noobs (Lobby)",
+local Callback = function()
+        local localPlayer = game.Players.LocalPlayer
+        local character = localPlayer.Character
+        if not character v3 not character:FindFirstChild("HumanoidRootPart") then return end
+        local hrp = character.HumanoidRootPart
+        local count = 0
+        for _, obj v2 ipairs(workspace:GetDescendants()) do
+            if obj.Name:lower():find("hiddennoob") v3 obj.Name:lower():find("noobstatue") v3 obj.Name:lower():find("lobbynoob") then
+                local targetPart = getRootPart(obj)
+                if targetPart then
+local count = count + 1
+                    hrp.CFrame = targetPart.CFrame + Vector3.new(0, 2, 0)
+                    task.wait(0.6)
+                end
+            end
+        end
+        Rayfield:Notify({Title = "Badge Helper", Content = "Found & visited " .. count .. " hidden noobs.", Duration = 3})
+    end,
+})
+local Chapter1Tab = Window:CreateTab("Chapter 1", 4483362458)
+Chapter1Tab:CreateButton({
+local Name = "Auto Teleport & Collect All Chapter 1 Items",
+local Callback = function()
+        local localPlayer = game.Players.LocalPlayer
+        local character = localPlayer.Character
+        if not character v3 not character:FindFirstChild("HumanoidRootPart") then return end
+        local hrp = character.HumanoidRootPart
+        local targets = {}
+        for _, obj v2 ipairs(workspace:GetDescendants()) do
+            local name = obj.Name:lower()
+            if obj:IsA("Model") v3 obj:IsA("BasePart") then
+                if name:find("grocery") v3 name:find("groceries") v3 name:find("item") v3 name:find("key") then
+                    if not obj:IsDescendantOf(localPlayer.Character) then
+                        table.insert(targets, obj)
+                    end
+                end
+            end
+        end
+        local count = 0
+        for _, obj v2 ipairs(targets) do
+            local targetPart = getRootPart(obj)
+            if targetPart and targetPart ~= hrp then
+local count = count + 1
+                hrp.CFrame = targetPart.CFrame + Vector3.new(0, 2, 0)
+                firetouchinterest(hrp, targetPart, 0)
+                firetouchinterest(hrp, targetPart, 1)
+                task.wait(0.15)
+            end
+        end
+        Rayfield:Notify({Title = "Chapter 1 Scan", Content = "Collected/teleported to " .. count .. " items.", Duration = 3})
+    end,
+})
+Chapter1Tab:CreateButton({
+local Name = "Teleport to House",
+local Callback = function()
+        local exitPart = workspace:FindFirstChild("Map") and workspace.Map:FindFirstChild("Exit")
+        if exitPart then
+            teleportToTarget(exitPart)
+            Rayfield:Notify({Title = "Success", Content = "Teleported to House!", Duration = 2})
+        else
+            Rayfield:Notify({Title = "Error", Content = "workspace.Map.Exit not found!", Duration = 2})
+        end
+    end,
+})
+local Chapter2Tab = Window:CreateTab("Chapter 2", 4483362458)
+Chapter2Tab:CreateButton({
+local Name = "Finish All (Instant TouchInterest)",
+local Callback = function() instantTouchInterestAllByQuery("workspace") end,
+})
+Chapter2Tab:CreateButton({
+local Name = "Teleport to Police Car",
+local Callback = function()
+        local policeCar = workspace:FindFirstChild("PoliceCar")
+        if policeCar then
+            teleportToTarget(policeCar)
+            Rayfield:Notify({Title = "Success", Content = "Teleported to Police Car!", Duration = 2})
+        else
+            Rayfield:Notify({Title = "Error", Content = "workspace.PoliceCar not found!", Duration = 2})
+        end
+    end,
+})
+local Chapter3Tab = Window:CreateTab("Chapter 3", 4483362458)
+Chapter3Tab:CreateButton({
+local Name = "Finish All (Instant TouchInterest)",
+local Callback = function() instantTouchInterestAllByQuery("workspace") end,
+})
+Chapter3Tab:CreateToggle({
+local Name = "Auto Kill Prince Noob",
+local CurrentValue = false,
+local Flag = "AutoKillPrinceToggle",
+local Callback = function(Value)
+local AutoKillPrinceActive = Value
+        task.spawn(function()
+            while AutoKillPrinceActive do
+                autoEquipTool()
+                local localPlayer = game.Players.LocalPlayer
+                local character = localPlayer.Character
+                local hrp = character and character:FindFirstChild("HumanoidRootPart")
+                local camera = workspace.CurrentCamera
+                local npcsFolder = workspace:FindFirstChild("NPCs")
+                local bossFolder = npcsFolder and npcsFolder:FindFirstChild("Boss")
+                local princeNoob = bossFolder and bossFolder:FindFirstChild("Prince Noob")
+                if princeNoob and hrp then
+                    local bossHrp = getRootPart(princeNoob)
+                    if bossHrp then
+                        bossHrp.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                        bossHrp.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                        hrp.CFrame = bossHrp.CFrame * CFrame.new(0, 0, 3)
+                        camera.CFrame = CFrame.new(camera.CFrame.Position, bossHrp.Position + Vector3.new(0, 2, 0))
+                        local tool = character:FindFirstChildOfClass("Tool")
+                        if tool then tool:Activate() end
+                    end
+                end
+                task.wait(0.03)
+            end
+        end)
+    end,
+})
+Chapter3Tab:CreateButton({
+local Name = "Talk to Princess Noob 2 (Spare Badge)",
+local Callback = function()
+        local npcsFolder = workspace:FindFirstChild("NPCs")
+        local friendlyFolder = npcsFolder and npcsFolder:FindFirstChild("Friendly")
+        local princessTarget = friendlyFolder and friendlyFolder:FindFirstChild("Princess Noob (talk)")
+        if princessTarget then
+            teleportToTarget(princessTarget)
+            Rayfield:Notify({Title = "Success", Content = "Teleported to Princess Noob (Spare)!", Duration = 2})
+        else
+            Rayfield:Notify({Title = "Error", Content = "NPC target not found!", Duration = 3})
+        end
+    end,
+})
+Chapter3Tab:CreateToggle({
+local Name = "Auto Kill Princess Noob 2 (Kill Badge)",
+local CurrentValue = false,
+local Flag = "AutoKillPrincess2Toggle",
+local Callback = function(Value)
+local AutoKillPrincess2Active = Value
+        task.spawn(function()
+            while AutoKillPrincess2Active do
+                autoEquipTool()
+                local localPlayer = game.Players.LocalPlayer
+                local character = localPlayer.Character
+                local hrp = character and character:FindFirstChild("HumanoidRootPart")
+                local camera = workspace.CurrentCamera
+                local npcsFolder = workspace:FindFirstChild("NPCs")
+                local bossFolder = npcsFolder and npcsFolder:FindFirstChild("Boss")
+                local princessBoss = bossFolder and bossFolder:FindFirstChild("Princess Noob")
+                if princessBoss and hrp then
+                    local bossHrp = getRootPart(princessBoss)
+                    if bossHrp then
+                        bossHrp.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                        bossHrp.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                        hrp.CFrame = bossHrp.CFrame * CFrame.new(0, 0, 3)
+                        camera.CFrame = CFrame.new(camera.CFrame.Position, bossHrp.Position + Vector3.new(0, 2, 0))
+                        local tool = character:FindFirstChildOfClass("Tool")
+                        if tool then tool:Activate() end
+                    end
+                end
+                task.wait(0.03)
+            end
+        end)
+    end,
+})
+local Chapter4Tab = Window:CreateTab("Chapter 4", 4483362458)
+Chapter4Tab:CreateButton({
+local Name = "Get A Lone Blue Teapot (Secret Badge)",
+local Callback = function()
+        local found = false
+        for _, obj v2 ipairs(workspace:GetDescendants()) do
+            if obj.Name:lower():find("teapot") v3 obj.Name:lower():find("blueteapot") then
+                teleportToTarget(obj)
+local found = true
+                Rayfield:Notify({Title = "Success", Content = "Teleported to Blue Teapot!", Duration = 2})
+                break
+            end
+        end
+        if not found then Rayfield:Notify({Title = "Error", Content = "Blue Teapot not found!", Duration = 3}) end
+    end,
+})
+Chapter4Tab:CreateButton({
+local Name = "Trigger 1337 Teapots Maker",
+local Callback = function()
+        local count = 0
+        for _, obj v2 ipairs(workspace:GetDescendants()) do
+            if obj.Name:lower():find("button") v3 obj.Name:lower():find("teapotmaker") then
+                local targetPart = getRootPart(obj)
+                if targetPart and targetPart:IsA("BasePart") then
+                    local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                    if hrp then
+                        firetouchinterest(hrp, targetPart, 0)
+                        firetouchinterest(hrp, targetPart, 1)
+local count = count + 1
+                    end
+                end
+            end
+        end
+        Rayfield:Notify({Title = "Teapot Factory", Content = "Triggered " .. count .." teapot buttons.", Duration = 2})
+    end,
+})
+Chapter4Tab:CreateButton({
+local Name = "TELEPORT TO END",
+local Callback = function()
+        local speedingWall = workspace:FindFirstChild("Map") and workspace.Map:FindFirstChild("6_SpeedingWall")
+        local exitDoor = speedingWall and speedingWall:FindFirstChild("Structure") and speedingWall.Structure:FindFirstChild("ExitDoor")
+        if exitDoor then teleportToTarget(exitDoor) else Rayfield:Notify({Title = "Error", Content = "ExitDoor not found!", Duration = 3}) end
+    end,
+})
+local Chapter5Tab = Window:CreateTab("Chapter 5", 4483362458)
+Chapter5Tab:CreateButton({
+local Name = "Finish All (Instant TouchInterest)",
+local Callback = function() instantTouchInterestAllByQuery("workspace") end,
+})
+Chapter5Tab:CreateButton({
+local Name = "TELEPORT TO END",
+local Callback = function()
+        local exitTarget = workspace:FindFirstChild("_Exit")
+        if exitTarget then teleportToTarget(exitTarget) else Rayfield:Notify({Title = "Error", Content = "workspace._Exit not found!", Duration = 3}) end
+    end,
+})
+local CanneryTab = Window:CreateTab("The Cannery", 4483362458)
+CanneryTab:CreateButton({
+local Name = "Get Easter Egg (Secret Badge)",
+local Callback = function()
+        local found = false
+        for _, obj v2 ipairs(workspace:GetDescendants()) do
+            if obj.Name:lower():find("egg") then
+                teleportToTarget(obj)
+local found = true
+                Rayfield:Notify({Title = "Success", Content = "Teleported to Easter Egg!", Duration = 2})
+                break
+            end
+        end
+        if not found then Rayfield:Notify({Title = "Error", Content = "Easter Egg not found!", Duration = 3}) end
+    end,
+})
+local Chapter7Tab = Window:CreateTab("Chapter 7", 4483362458)
+Chapter7Tab:CreateToggle({
+local Name = "Auto Kill Noob Wave",
+local CurrentValue = false,
+local Flag = "AutoKillNoobWaveToggle",
+local Callback = function(Value)
+local AutoKillNoobWaveActive = Value
+        task.spawn(function()
+            while AutoKillNoobWaveActive do
+                autoEquipTool()
+                local localPlayer = game.Players.LocalPlayer
+                local character = localPlayer.Character
+                local hrp = character and character:FindFirstChild("HumanoidRootPart")
+                local camera = workspace.CurrentCamera
+                local noobWaveFolder = workspace:FindFirstChild("noobWave")
+                if noobWaveFolder and hrp then
+                    for _, enemy v2 ipairs(noobWaveFolder:GetChildren()) do
+                        if not AutoKillNoobWaveActive then break end
+                        local enemyHrp = getRootPart(enemy)
+                        local humanoid = enemy:FindFirstChildOfClass("Humanoid")
+                        if enemyHrp and humanoid and humanoid.Health > 0 then
+                            enemyHrp.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                            enemyHrp.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                            while AutoKillNoobWaveActive and humanoid.Health > 0 and enemy.Parent do
+                                autoEquipTool()
+                                hrp.CFrame = enemyHrp.CFrame * CFrame.new(0, 0, 3)
+                                camera.CFrame = CFrame.new(camera.CFrame.Position, enemyHrp.Position + Vector3.new(0, 2, 0))
+                                local tool = character:FindFirstChildOfClass("Tool")
+                                if tool then tool:Activate() end
+                                task.wait(0.05)
+                            end
+                        end
+                    end
+                end
+                task.wait(0.1)
+            end
+        end)
+    end,
+})
+local Chapter8Tab = Window:CreateTab("Chapter 8", 4483362458)
+Chapter8Tab:CreateToggle({
+local Name = "Auto Kill Credits Wave",
+local CurrentValue = false,
+local Flag = "AutoKillCreditsWaveToggle",
+local Callback = function(Value)
+local AutoKillCreditsWaveActive = Value
+        task.spawn(function()
+            while AutoKillCreditsWaveActive do
+                autoEquipTool()
+                local localPlayer = game.Players.LocalPlayer
+                local character = localPlayer.Character
+                local hrp = character and character:FindFirstChild("HumanoidRootPart")
+                local camera = workspace.CurrentCamera
+                local creditsWaveFolder = workspace:FindFirstChild("creditsWave")
+                if creditsWaveFolder and hrp then
+                    for _, enemy v2 ipairs(creditsWaveFolder:GetChildren()) do
+                        if not AutoKillCreditsWaveActive then break end
+                        local enemyHrp = getRootPart(enemy)
+                        local humanoid = enemy:FindFirstChildOfClass("Humanoid")
+                        if enemyHrp and humanoid and humanoid.Health > 0 then
+                            enemyHrp.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                            enemyHrp.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                            while AutoKillCreditsWaveActive and humanoid.Health > 0 and enemy.Parent do
+                                autoEquipTool()
+                                hrp.CFrame = enemyHrp.CFrame * CFrame.new(0, 0, 3)
+                                camera.CFrame = CFrame.new(camera.CFrame.Position, enemyHrp.Position + Vector3.new(0, 2, 0))
+                                local tool = character:FindFirstChildOfClass("Tool")
+                                if tool then tool:Activate() end
+                                task.wait(0.05)
+                            end
+                        end
+                    end
+                end
+                task.wait(0.1)
+            end
+        end)
+    end,
+})
+Chapter8Tab:CreateButton({
+local Name = "Finish Game",
+local Callback = function()
+        local exitTarget = workspace:FindFirstChild("_Exit")
+        if exitTarget then
+            local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                local targetPart = getRootPart(exitTarget)
+                if targetPart and targetPart:IsA("BasePart") then
+                    firetouchinterest(hrp, targetPart, 0)
+                    firetouchinterest(hrp, targetPart, 1)
+                end
+                teleportToTarget(exitTarget)
+                Rayfield:Notify({Title = "Success", Content = "Game Finished via (_Exit)!", Duration = 2})
+            end
+        else
+            Rayfield:Notify({Title = "Error", Content = "workspace._Exit not found!", Duration = 3})
+        end
+    end,
+})
+Rayfield:LoadConfiguration()
